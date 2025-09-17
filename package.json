@@ -1,0 +1,41 @@
+{
+  "name": "ocr-app",
+  "version": "1.0.0",
+  "description": "Modern OCR to text web app with TypeScript and Express for Vercel",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node src/index.js",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cors": "2.8.5",
+    "express": "4.21.2",
+    "multer": "2.0.2",
+    "tesseract.js": "6.0.1"
+  },
+  "devDependencies": {
+    "@types/cors": "2.8.19",
+    "@types/express": "4.17.23",
+    "@types/multer": "2.0.0",
+    "@types/node": "24.5.1",
+    "tsx": "4.20.5",
+    "typescript": "5.8.2"
+  },
+  "keywords": [
+    "ocr",
+    "typescript",
+    "express",
+    "vercel",
+    "tesseract"
+  ],
+  "author": "Habib Opeyemi Adebayo",
+  "license": "MIT",
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "esbuild",
+      "tesseract.js"
+    ]
+  }
+}

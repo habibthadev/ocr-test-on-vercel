@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OCR Text Extractor</title>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Geist&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Geist", sans-serif;
+      }
+
+      body {
+        background-color: #ffffff;
+        color: #000000;
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+      }
+
+      .header p {
+        font-size: 1.125rem;
+        color: #666666;
+      }
+
+      .upload-section {
+        background-color: #ffffff;
+        border: 2px dashed #e4e4e7;
+        border-radius: 0.75rem;
+        padding: 3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+      }
+
+      .upload-section:hover {
+        border-color: #000000;
+        background-color: #fafafa;
+      }
+
+      .upload-section.dragover {
+        border-color: #000000;
+        background-color: #f4f4f5;
+      }
+
+      .upload-icon {
+        font-size: 3rem;
+        color: #a1a1aa;
+        margin-bottom: 1rem;
+      }
+
+      .upload-text {
+        font-size: 1.125rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+
+      .upload-subtext {
+        font-size: 0.875rem;
+        color: #666666;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        border: 1px solid;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background-color: #000000;
+        color: #ffffff;
+        border-color: #000000;
+      }
+
+      .btn-primary:hover {
+        background-color: #1a1a1a;
+      }
+
+      .btn-secondary {
+        background-color: #ffffff;
+        color: #000000;
+        border-color: #e4e4e7;
+      }
+
+      .btn-secondary:hover {
+        background-color: #f4f4f5;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 0.5rem;
+        background-color: #f4f4f5;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        margin: 1rem 0;
+        display: none;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background-color: #000000;
+        transition: width 0.3s ease;
+        width: 0%;
+      }
+
+      .results-section {
+        display: none;
+        margin-top: 2rem;
+      }
+
+      .results-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .results-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .results-content {
+        background-color: #fafafa;
+        border: 1px solid #e4e4e7;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        position: relative;
+      }
+
+      .extracted-text {
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        min-height: 150px;
+        max-height: 400px;
+        overflow-y: auto;
+        background-color: #ffffff;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e4e4e7;
+        margin-bottom: 1rem;
+      }
+
+      .file-info {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: #666666;
+        margin-bottom: 1rem;
+      }
+
+      .copy-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+      }
+
+      .error-message {
+        background-color: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin: 1rem 0;
+        display: none;
+      }
+
+      .success-message {
+        background-color: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin: 1rem 0;
+        display: none;
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #000000;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .preview-section {
+        display: none;
+        margin: 2rem 0;
+      }
+
+      .preview-image {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 0.5rem;
+        border: 1px solid #e4e4e7;
+        object-fit: contain;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .upload-section {
+          padding: 2rem 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>OCR Text Extractor</h1>
+        <p>
+          Extract text from images using advanced optical character recognition
+        </p>
+      </header>
+
+      <main>
+        <div class="upload-section" id="uploadArea">
+          <div class="upload-icon">
+            <i class="ph ph-upload-simple"></i>
+          </div>
+          <div class="upload-text">Click to upload or drag and drop</div>
+          <div class="upload-subtext">PNG, JPG, GIF, BMP, WEBP up to 10MB</div>
+          <input
+            type="file"
+            id="fileInput"
+            class="file-input"
+            accept="image/*"
+          />
+        </div>
+
+        <div class="progress-bar" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="preview-section" id="previewSection">
+          <h3>Preview</h3>
+          <img id="previewImage" class="preview-image" alt="Preview" />
+        </div>
+
+        <div class="results-section" id="resultsSection">
+          <div class="results-header">
+            <h2 class="results-title">Extracted Text</h2>
+          </div>
+          <div class="results-content">
+            <button class="btn btn-secondary copy-btn" id="copyBtn">
+              <i class="ph ph-copy"></i>
+              Copy
+            </button>
+            <div class="file-info" id="fileInfo"></div>
+            <div class="extracted-text" id="extractedText"></div>
+            <div style="display: flex; gap: 1rem">
+              <button class="btn btn-secondary" id="downloadBtn">
+                <i class="ph ph-download-simple"></i>
+                Download as TXT
+              </button>
+              <button class="btn btn-primary" id="newImageBtn">
+                <i class="ph ph-plus"></i>
+                Process New Image
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      class OCRApp {
+        constructor() {
+          this.uploadArea = document.getElementById("uploadArea");
+          this.fileInput = document.getElementById("fileInput");
+          this.progressBar = document.getElementById("progressBar");
+          this.progressFill = document.getElementById("progressFill");
+          this.errorMessage = document.getElementById("errorMessage");
+          this.successMessage = document.getElementById("successMessage");
+          this.previewSection = document.getElementById("previewSection");
+          this.previewImage = document.getElementById("previewImage");
+          this.resultsSection = document.getElementById("resultsSection");
+          this.extractedText = document.getElementById("extractedText");
+          this.fileInfo = document.getElementById("fileInfo");
+          this.copyBtn = document.getElementById("copyBtn");
+          this.downloadBtn = document.getElementById("downloadBtn");
+          this.newImageBtn = document.getElementById("newImageBtn");
+
+          this.init();
+        }
+
+        init() {
+          this.uploadArea.addEventListener("click", () =>
+            this.fileInput.click()
+          );
+          this.fileInput.addEventListener("change", (e) =>
+            this.handleFile(e.target.files[0])
+          );
+
+          this.uploadArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            this.uploadArea.classList.add("dragover");
+          });
+
+          this.uploadArea.addEventListener("dragleave", () => {
+            this.uploadArea.classList.remove("dragover");
+          });
+
+          this.uploadArea.addEventListener("drop", (e) => {
+            e.preventDefault();
+            this.uploadArea.classList.remove("dragover");
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith("image/")) {
+              this.handleFile(file);
+            }
+          });
+
+          this.copyBtn.addEventListener("click", () => this.copyText());
+          this.downloadBtn.addEventListener("click", () => this.downloadText());
+          this.newImageBtn.addEventListener("click", () => this.reset());
+        }
+
+        showMessage(message, type = "error") {
+          this.hideMessages();
+          const element =
+            type === "error" ? this.errorMessage : this.successMessage;
+          element.textContent = message;
+          element.style.display = "block";
+
+          setTimeout(() => {
+            element.style.display = "none";
+          }, 5000);
+        }
+
+        hideMessages() {
+          this.errorMessage.style.display = "none";
+          this.successMessage.style.display = "none";
+        }
+
+        showProgress() {
+          this.progressBar.style.display = "block";
+          this.progressFill.style.width = "0%";
+
+          let progress = 0;
+          const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            this.progressFill.style.width = progress + "%";
+          }, 200);
+
+          return () => {
+            clearInterval(interval);
+            this.progressFill.style.width = "100%";
+            setTimeout(() => {
+              this.progressBar.style.display = "none";
+            }, 500);
+          };
+        }
+
+        async handleFile(file) {
+          if (!file) return;
+
+          if (!file.type.startsWith("image/")) {
+            this.showMessage("Please select a valid image file.");
+            return;
+          }
+
+          if (file.size > 10 * 1024 * 1024) {
+            this.showMessage("File size must be less than 10MB.");
+            return;
+          }
+
+          this.hideMessages();
+          this.previewImage.src = URL.createObjectURL(file);
+          this.previewSection.style.display = "block";
+
+          const stopProgress = this.showProgress();
+
+          try {
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const response = await fetch("/api/ocr", {
+              method: "POST",
+              body: formData,
+            });
+
+            const result = await response.json();
+
+            stopProgress();
+
+            if (!response.ok) {
+              throw new Error(result.error || "OCR processing failed");
+            }
+
+            this.displayResults(result, file);
+            this.showMessage("Text extracted successfully!", "success");
+          } catch (error) {
+            stopProgress();
+            this.showMessage(error.message || "Failed to process image");
+          }
+        }
+
+        displayResults(result, file) {
+          this.extractedText.textContent =
+            result.text || "No text found in the image.";
+
+          this.fileInfo.innerHTML = `
+                    <span><strong>File:</strong> ${result.filename}</span>
+                    <span><strong>Size:</strong> ${this.formatFileSize(
+                      result.size
+                    )}</span>
+                    <span><strong>Characters:</strong> ${
+                      result.text.length
+                    }</span>
+                `;
+
+          this.resultsSection.style.display = "block";
+          this.resultsSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+
+        formatFileSize(bytes) {
+          if (bytes === 0) return "0 Bytes";
+          const k = 1024;
+          const sizes = ["Bytes", "KB", "MB", "GB"];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return (
+            parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+          );
+        }
+
+        async copyText() {
+          try {
+            await navigator.clipboard.writeText(this.extractedText.textContent);
+            this.copyBtn.innerHTML = '<i class="ph ph-check"></i> Copied!';
+            setTimeout(() => {
+              this.copyBtn.innerHTML = '<i class="ph ph-copy"></i> Copy';
+            }, 2000);
+          } catch (err) {
+            this.showMessage("Failed to copy text to clipboard");
+          }
+        }
+
+        downloadText() {
+          const text = this.extractedText.textContent;
+          const blob = new Blob([text], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "extracted-text.txt";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+
+        reset() {
+          this.fileInput.value = "";
+          this.previewSection.style.display = "none";
+          this.resultsSection.style.display = "none";
+          this.progressBar.style.display = "none";
+          this.hideMessages();
+          this.uploadArea.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        new OCRApp();
+      });
+    </script>
+  </body>
+</html>
