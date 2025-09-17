@@ -3,6 +3,7 @@ import cors from "cors";
 import multer from "multer";
 import { createWorker } from "tesseract.js";
 import path from "path";
+import { log } from "console";
 
 const app: Application = express();
 
@@ -39,33 +40,41 @@ app.get("/", (req: Request, res: Response) => {
   res.sendFile(path.join(process.cwd(), "public", "index.html"));
 });
 
-app.post("/api/ocr", upload.single("image"), async (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No image file provided" });
+app.post(
+  "/api/ocr",
+  upload.single("image"),
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+
+      const worker = await createWorker("eng", 1, {
+        workerPath: "https://unpkg.com/tesseract.js@6.0.1/dist/worker.min.js",
+        corePath:
+          "https://unpkg.com/tesseract.js-core@6.0.0/tesseract-core-simd.wasm.js",
+      });
+
+      const {
+        data: { text },
+      } = await worker.recognize(req.file.buffer);
+
+      await worker.terminate();
+
+      res.json({
+        text: text.trim(),
+        filename: req.file.originalname,
+        size: req.file.size,
+      });
+    } catch (error) {
+      console.error("OCR Error:", error);
+      res.status(500).json({
+        error: "Failed to process image",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
     }
-
-    const worker = await createWorker("eng");
-
-    const {
-      data: { text },
-    } = await worker.recognize(req.file.buffer);
-
-    await worker.terminate();
-
-    res.json({
-      text: text.trim(),
-      filename: req.file.originalname,
-      size: req.file.size,
-    });
-  } catch (error) {
-    console.error("OCR Error:", error);
-    res.status(500).json({
-      error: "Failed to process image",
-      details: error instanceof Error ? error.message : "Unknown error",
-    });
   }
-});
+);
 
 app.get("/api/health", (req: Request, res: Response) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
