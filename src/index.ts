@@ -50,7 +50,6 @@ app.post(
       }
 
       const worker = await createWorker("eng", 1, {
-        workerPath: "https://unpkg.com/tesseract.js@6.0.1/dist/worker.min.js",
         corePath:
           "https://unpkg.com/tesseract.js-core@6.0.0/tesseract-core-simd.wasm.js",
       });
