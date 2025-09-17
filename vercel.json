@@ -3,7 +3,16 @@
   "builds": [
     {
       "src": "src/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "node_modules/.pnpm/tesseract.js-core@6.0.0/node_modules/tesseract.js-core/**",
+          "node_modules/.pnpm/tesseract.js@6.0.1/node_modules/tesseract.js/**",
+          "node_modules/tesseract.js-core/**",
+          "node_modules/tesseract.js/src/worker/**",
+          "node_modules/tesseract.js/dist/worker/**"
+        ]
+      }
     }
   ],
   "routes": [
