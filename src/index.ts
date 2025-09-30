@@ -3,7 +3,6 @@ import cors from "cors";
 import multer from "multer";
 import { createWorker } from "tesseract.js";
 import path from "path";
-import { log } from "console";
 
 const app: Application = express();
 
@@ -49,10 +48,7 @@ app.post(
         return res.status(400).json({ error: "No image file provided" });
       }
 
-      const worker = await createWorker("eng", 1, {
-        corePath:
-          "https://unpkg.com/tesseract.js-core@6.0.0/tesseract-core-simd.wasm.js",
-      });
+      const worker = await createWorker("eng");
 
       const {
         data: { text },
@@ -102,10 +98,11 @@ app.use(
   }
 );
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+  console.log(`http://localhost:${port}`);
 });
 
 export default app;
