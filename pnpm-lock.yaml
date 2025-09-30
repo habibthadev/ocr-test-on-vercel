@@ -18,8 +18,8 @@ importers:
         specifier: 2.0.2
         version: 2.0.2
       tesseract.js:
-        specifier: 6.0.1
-        version: 6.0.1
+        specifier: ^4.0.6
+        version: 4.1.4
     devDependencies:
       '@types/cors':
         specifier: 2.8.19
@@ -416,6 +416,9 @@ packages:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
 
+  is-electron@2.2.2:
+    resolution: {integrity: sha512-FO/Rhvz5tuw4MCWkpMzHFKWD2LsfHzIb7i6MdPYZ/KW7AlxawyLkqdy+jPZP1WubqEADE3O4FUENlJHDfQASRg==}
+
   is-url@1.2.4:
     resolution: {integrity: sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==}
 
@@ -573,11 +576,11 @@ packages:
   string_decoder@1.1.1:
     resolution: {integrity: sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==}
 
-  tesseract.js-core@6.0.0:
-    resolution: {integrity: sha512-1Qncm/9oKM7xgrQXZXNB+NRh19qiXGhxlrR8EwFbK5SaUbPZnS5OMtP/ghtqfd23hsr1ZvZbZjeuAGcMxd/ooA==}
+  tesseract.js-core@4.0.4:
+    resolution: {integrity: sha512-MJ+vtktjAaT0681uPl6TDUPhbRbpD/S9emko5rtorgHRZpQo7R3BG7h+3pVHgn1KjfNf1bvnx4B7KxEK8YKqpg==}
 
-  tesseract.js@6.0.1:
-    resolution: {integrity: sha512-/sPvMvrCtgxnNRCjbTYbr7BRu0yfWDsMZQ2a/T5aN/L1t8wUQN6tTWv6p6FwzpoEBA0jrN2UD2SX4QQFRdoDbA==}
+  tesseract.js@4.1.4:
+    resolution: {integrity: sha512-iLjJjLWVNV4PApofEsd54Y1MbjhzpPxEzF8EjYmC2CLN4hrUqO5aTNTSbGA7/QjycKtAWHhn2YmDR+6GFwi2Zg==}
 
   toidentifier@1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
@@ -1005,6 +1008,8 @@ snapshots:
 
   ipaddr.js@1.9.1: {}
 
+  is-electron@2.2.2: {}
+
   is-url@1.2.4: {}
 
   math-intrinsics@1.1.0: {}
@@ -1162,17 +1167,18 @@ snapshots:
     dependencies:
       safe-buffer: 5.1.2
 
-  tesseract.js-core@6.0.0: {}
+  tesseract.js-core@4.0.4: {}
 
-  tesseract.js@6.0.1:
+  tesseract.js@4.1.4:
     dependencies:
       bmp-js: 0.1.0
       idb-keyval: 6.2.2
+      is-electron: 2.2.2
       is-url: 1.2.4
       node-fetch: 2.7.0
       opencollective-postinstall: 2.0.3
       regenerator-runtime: 0.13.11
-      tesseract.js-core: 6.0.0
+      tesseract.js-core: 4.0.4
       wasm-feature-detect: 1.8.0
       zlibjs: 0.3.1
     transitivePeerDependencies:
